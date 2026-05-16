@@ -13,11 +13,13 @@ public class BSTChecker {
     public boolean isBinarySearchTree(GenericTree<Integer> tree) {
 
         GenericTreeNode<Integer> root = tree.getRoot();
-        return iterateTree(root);
+        return recurseTree(root);
     }
 
     // recursively iterate
-    private boolean iterateTree(GenericTreeNode<Integer> root) {
+    private boolean recurseTree(GenericTreeNode<Integer> root) {
+
+        if (root.getChildren().size() > _maxChildren) return false;
 
         List<GenericTreeNode<Integer>> children = root.getChildren();
 
@@ -32,13 +34,13 @@ public class BSTChecker {
             if (leftChild != null) {
 
                 // if the left child is greater than the pivot we have an invalidation
-                if (leftChild.getValue() > root.getValue() || leftChild.getChildren().size() > _maxChildren) {
+                if (leftChild.getValue() > root.getValue()) {
                     leftIsTree = false;
                 }
 
                 if (!leftChild.getChildren().isEmpty()) {
                     // the left child is now the pivot point
-                    leftIsTree = leftIsTree && iterateTree(leftChild);
+                    leftIsTree = leftIsTree && recurseTree(leftChild);
                 }
             }
 
@@ -46,13 +48,13 @@ public class BSTChecker {
             if (rightChild != null) {
 
                 // If the right child is less than the pivot we have an invalidation
-                if (rightChild.getValue() < root.getValue() || rightChild.getChildren().size() > _maxChildren) {
+                if (rightChild.getValue() < root.getValue()) {
                     rightIsTree = false;
                 }
 
                 if (!rightChild.getChildren().isEmpty()) {
                     // the right child is now the pivot point
-                    rightIsTree = rightIsTree && iterateTree(rightChild);
+                    rightIsTree = rightIsTree && recurseTree(rightChild);
                 }
             }
         }
