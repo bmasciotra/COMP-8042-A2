@@ -16,7 +16,15 @@ public class BSTChecker {
         return recurseTree(root);
     }
 
-    // recursively iterate
+
+    /***
+     * Recurse tree recursively traverses the tree based on the root and its children. The algorithm verifies the
+     * amount of children and the values in context to the root and returns if that value breaks the rules
+     * of a binary search tree
+     *
+     * @param root the root being examined
+     * @return if the root has verified or broken the binary tree rules
+     */
     private boolean recurseTree(GenericTreeNode<Integer> root) {
 
         if (root.getChildren().size() > _maxChildren) return false;
@@ -32,7 +40,6 @@ public class BSTChecker {
             GenericTreeNode<Integer> rightChild = children.get(_right);
 
             if (leftChild != null) {
-
                 // if the left child is greater than the pivot we have an invalidation
                 if (leftChild.getValue() > root.getValue()) {
                     leftIsTree = false;
@@ -46,7 +53,6 @@ public class BSTChecker {
 
             // recurse the right side
             if (rightChild != null) {
-
                 // If the right child is less than the pivot we have an invalidation
                 if (rightChild.getValue() < root.getValue()) {
                     rightIsTree = false;
