@@ -68,14 +68,27 @@ public class Main {
         contacts.removeContact("John Smith");
         contacts.getEveryContact().forEach(System.out::println);
 
+        System.out.println();
+
         // Problem 3: Friend Graph
         FriendGraph fg = new FriendGraph();
 
         Contact john = new Contact("John Smith", "john.smith@example.com", "604-555-0101");
         Contact alice = new Contact("Alice Anderson", "alice.a@example.com", "604-555-0102");
         Contact arjun = new Contact("Arjun Singh", "arjun.s@example.com", "604-555-0115");
+        Contact david = new Contact("David Brown", "dbrown@example.com", "604-555-0112");
+        Contact lucy = new Contact("Lucy Williams", "lwilliams@example.com", "604-555-0109");
 
+        // Add friends
         fg.addFriend(john, alice);
         fg.addFriend(arjun, john);
+        fg.addFriend(david, alice);
+        fg.addFriend(lucy, john);
+        fg.addFriend(lucy, alice);
+
+        // remove friends
+        fg.removeFriend(arjun, john);
+
+        System.out.println(fg);
     }
 }

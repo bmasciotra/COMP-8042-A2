@@ -22,11 +22,11 @@ public class FriendGraph {
     /**
      * Add friend allows a main contact (ie the friend) to add a new friend relationship to the graph
      * <p>
-     * this contact will now have a new edge for that friend and it will be represented as 1 or 0 where 1 is there is a
+     * this contact will now have a new edge for that friend, and it will be represented as 1 or 0 where 1 is there is a
      * relationship
      *
-     * @param contact
-     * @param friend
+     * @param contact the contact adding the friendship edge
+     * @param friend  the friend adding the contacts edge
      */
     public void addFriend(Contact contact, Contact friend) {
 
@@ -36,6 +36,7 @@ public class FriendGraph {
 
         // After we have added the users to the map, check the size of the friends array to resize if necessary
         if (friends.length < contactMap.size()) {
+            // Double the size if we have to resize
             int[][] resize = new int[contactMap.size()][contactMap.size()];
 
             for (int i = 0; i < friends.length; i++) {
@@ -50,8 +51,12 @@ public class FriendGraph {
         friends[friendIndex][contactIndex] = 1;
     }
 
-    public void removeFriend() {
+    public void removeFriend(Contact contact, Contact friend) {
+        Integer contactIndex = contactMap.get(contact);
+        Integer friendIndex = contactMap.get(friend);
 
+        friends[contactIndex][friendIndex] = 0;
+        friends[friendIndex][contactIndex] = 0;
     }
 
     public void displayAllFriends() {
