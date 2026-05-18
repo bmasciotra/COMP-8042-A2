@@ -1,6 +1,7 @@
 import bst.BSTChecker;
 import contact.Contact;
 import contact.ContactList;
+import graphs.FriendGraph;
 import reader.DotFileReader;
 import trees.GenericTree;
 
@@ -66,5 +67,15 @@ public class Main {
         System.out.println("\n[removeContact 'John Smith' then list again]");
         contacts.removeContact("John Smith");
         contacts.getEveryContact().forEach(System.out::println);
+
+        // Problem 3: Friend Graph
+        FriendGraph fg = new FriendGraph();
+
+        Contact john = new Contact("John Smith", "john.smith@example.com", "604-555-0101");
+        Contact alice = new Contact("Alice Anderson", "alice.a@example.com", "604-555-0102");
+        Contact arjun = new Contact("Arjun Singh", "arjun.s@example.com", "604-555-0115");
+
+        fg.addFriend(john, alice);
+        fg.addFriend(arjun, john);
     }
 }

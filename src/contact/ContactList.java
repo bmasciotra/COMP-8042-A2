@@ -2,6 +2,7 @@ package contact;
 
 import tree.nodes.AvlTreeNode;
 import trees.AvlTree;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +35,10 @@ public class ContactList {
         return StreamSupport.stream(this.contacts.levelOrderTraverse().spliterator(), false).map(AvlTreeNode<Contact>::getValue).collect(Collectors.toList());
     }
 
+    public int getAmountOfContacts() {
+        return getEveryContact().size();
+    }
+
     /**
      * We can perform a binary search because the name starts with the letter and is the main criteria for how the tree
      * is structured
@@ -49,31 +54,6 @@ public class ContactList {
         return contactList;
     }
 
-    /***
-     * Recursively traverses the tree and adds contacts to a list when their name starts with the given letter c (case ignored)
-     * @param root the root node we are examining
-     * @param c the char that we are matching to the first char of the contacts name
-     * @param contacts a list of contacts
-     */
-    private void traverseAndCheckName(AvlTreeNode<Contact> root, char c, List<Contact> contacts) {
-        if (root == null) return;
-
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) == Character.toLowerCase(c)) {
-            contacts.add(root.getValue());
-
-            // Traverse both sides
-            traverseAndCheckName(root.getLeftChild(), c, contacts);
-            traverseAndCheckName(root.getRightChild(), c, contacts);
-        }
-
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) < Character.toLowerCase(c)) {
-            traverseAndCheckName(root.getRightChild(), c, contacts);
-        }
-
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) >= Character.toLowerCase(c)) {
-            traverseAndCheckName(root.getLeftChild(), c, contacts);
-        }
-    }
 
     /**
      * Traverse the entire tree as contact names could contain the segment at any point within their name
@@ -102,4 +82,32 @@ public class ContactList {
             return findContact(root.getRightChild(), name);
         }
     }
+
+    /***
+     * Recursively traverses the tree and adds contacts to a list when their name starts with the given letter c (case ignored)
+     * @param root the root node we are examining
+     * @param c the char that we are matching to the first char of the contacts name
+     * @param contacts a list of contacts
+     */
+    private void traverseAndCheckName(AvlTreeNode<Contact> root, char c, List<Contact> contacts) {
+        if (root == null) return;
+
+        if (Character.toLowerCase(root.getValue().getName().charAt(0)) == Character.toLowerCase(c)) {
+            contacts.add(root.getValue());
+
+            // Traverse both sides
+            traverseAndCheckName(root.getLeftChild(), c, contacts);
+            traverseAndCheckName(root.getRightChild(), c, contacts);
+        }
+
+        if (Character.toLowerCase(root.getValue().getName().charAt(0)) < Character.toLowerCase(c)) {
+            traverseAndCheckName(root.getRightChild(), c, contacts);
+        }
+
+        if (Character.toLowerCase(root.getValue().getName().charAt(0)) >= Character.toLowerCase(c)) {
+            traverseAndCheckName(root.getLeftChild(), c, contacts);
+        }
+    }
+
+
 }
