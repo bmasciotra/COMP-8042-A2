@@ -64,6 +64,11 @@ public class FriendGraph {
         friends[friendIndex][contactIndex] = 0;
     }
 
+    /**
+     * Displays a contacts entire friend network
+     *
+     * @param c the contact
+     */
     public void displayAllFriends(Contact c) {
 
         int adjacencyIndex = contactMap.get(c);
@@ -84,6 +89,9 @@ public class FriendGraph {
         System.out.println();
     }
 
+    /**
+     * Displays the Contact with the most friends
+     */
     public void displayMostFriends() {
 
         Contact contactIndexWithMostFriends = null;
