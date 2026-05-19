@@ -2,10 +2,13 @@ package graphs;
 
 import contact.Contact;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 public class FriendGraph {
+
+    private final int NOT_VISITED = -1;
+    private final int FRIEND = 1;
+    private final int INITIAL_DIST = 0;
 
     // the contact map represents a hashmap for a user and their index in the friends list
     private final HashMap<Contact, Integer> contactMap;
@@ -13,6 +16,7 @@ public class FriendGraph {
     // an adjacency matrix where a contact is represented by an index and their relationships by another int, 0 for no
     // relationship and 1 for relationship
     private int[][] friends = new int[2][2];
+
 
     public FriendGraph() {
         contactMap = new HashMap<>();
@@ -59,24 +63,127 @@ public class FriendGraph {
         friends[friendIndex][contactIndex] = 0;
     }
 
-    public void displayAllFriends() {
+    public void displayAllFriends(Contact c) {
 
+        int adjacencyIndex = contactMap.get(c);
+        int[] friendsList = friends[adjacencyIndex];
+
+        // find all the contacts friend/relationships
+        Contact[] contactList = contactMap.entrySet().stream()
+                .filter(e -> friendsList[e.getValue()] == FRIEND)
+                .map(Map.Entry::getKey)
+                .toArray(Contact[]::new);
+
+        System.out.format("The following friends are \"%s's\" friends:\n", c.getName(), 1024);
+
+        for (Contact contact : contactList) {
+            System.out.println(contact);
+        }
+
+        System.out.println();
     }
 
     public void displayMostFriends() {
 
+        Contact contactIndexWithMostFriends = null;
+        int mostAmountOfFriends = 0;
+
+        for (Map.Entry<Contact, Integer> entry : contactMap.entrySet()) {
+            Contact c = entry.getKey();
+            Integer index = entry.getValue();
+
+            int amountOfFriendsForContact = (int) Arrays.stream(friends[index]).filter(v -> v == 1).count();
+            if (amountOfFriendsForContact > mostAmountOfFriends) {
+                mostAmountOfFriends = amountOfFriendsForContact;
+                contactIndexWithMostFriends = c;
+            }
+        }
+
+        System.out.println(contactIndexWithMostFriends);
+
     }
 
-    public void shortestPathBetweenTwoPeople() {
+    public LinkedList<Contact> shortestPathBetweenTwoPeople(Contact contact, Contact friend) {
 
+        LinkedList<Contact> queue = new LinkedList<>();
+        HashMap<Contact, Integer> distances = new HashMap<>();
+        HashMap<Contact, Contact> predecessor = new HashMap<>();
+
+        for (Contact c : contactMap.keySet()) {
+            // -1 is our infinity and the initial value to know that a contact has not been visited
+            distances.put(c, NOT_VISITED);
+        }
+
+        if (contact == friend) {
+            System.out.println("No distance");
+            return new LinkedList<>();
+        }
+
+        queue.add(contact);
+        distances.put(contact, INITIAL_DIST);
+
+        while (!queue.isEmpty()) {
+            Contact c = queue.poll();
+            int index = contactMap.get(c);
+
+            for (Map.Entry<Contact, Integer> entry : contactMap.entrySet()) {
+                Contact f = entry.getKey();
+                int fIndex = entry.getValue();
+
+                // contact is not a neighbor if adjacency shows 0
+                if (friends[index][fIndex] != FRIEND) continue;
+                // if distances registers -1 that user has not been visited
+                if (distances.get(f) != NOT_VISITED) continue;
+
+                distances.put(f, distances.get(c) + 1);
+                predecessor.put(f, c);
+                queue.add(f);                                // enqueue only when newly discovered
+            }
+        }
+
+        // Reconstruct the path by walking predecessors backwards from friend
+        LinkedList<Contact> path = new LinkedList<>();
+
+        if (distances.get(friend) == NOT_VISITED) {
+            return path;                 // no path exists — return empty
+        }
+
+        for (Contact step = friend; step != null; step = predecessor.get(step)) {
+            path.addFirst(step);
+        }
+
+        return path;
     }
+
+    public void printPath(LinkedList<Contact> path) {
+        if (path.isEmpty()) {
+            System.out.println("No path exists");
+            return;
+        }
+
+        if (path.size() == 1) {
+            System.out.println(path.getFirst().getName());
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder("through ");
+        sb.append(path.get(0).getName())
+                .append("'s friend ")
+                .append(path.get(1).getName());
+
+        for (int i = 2; i < path.size(); i++) {
+            sb.append(" who knows ").append(path.get(i).getName());
+        }
+
+        System.out.println(sb);
+    }
+
 
     @Override
     public String toString() {
         int n = contactMap.size();
         if (n == 0) return "(empty graph)\n";
 
-        // Invert contactMap so we can label rows/columns by index.
         Contact[] byIndex = new Contact[n];
         for (Contact c : contactMap.keySet()) {
             byIndex[contactMap.get(c)] = c;
@@ -85,14 +192,12 @@ public class FriendGraph {
         int colWidth = 10;
         StringBuilder sb = new StringBuilder();
 
-        // Header: blank corner cell, then a column per contact.
         sb.append(pad("", colWidth));
         for (int j = 0; j < n; j++) {
             sb.append(pad(byIndex[j].getName(), colWidth));
         }
         sb.append('\n');
 
-        // Body: row label, then the 0/1 cells for that row.
         for (int i = 0; i < n; i++) {
             sb.append(pad(byIndex[i].getName(), colWidth));
             for (int j = 0; j < n; j++) {

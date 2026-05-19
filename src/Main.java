@@ -6,6 +6,8 @@ import reader.DotFileReader;
 import trees.GenericTree;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -85,10 +87,25 @@ public class Main {
         fg.addFriend(david, alice);
         fg.addFriend(lucy, john);
         fg.addFriend(lucy, alice);
+        fg.addFriend(arjun, lucy);
 
         // remove friends
         fg.removeFriend(arjun, john);
 
+        // most friends
+        System.out.println("The user with the most friends:");
+        fg.displayMostFriends();
+        System.out.println();
+
+        // display all friends
+        fg.displayAllFriends(john);
+
+        // shortest path
+        LinkedList<Contact> shortestPath = fg.shortestPathBetweenTwoPeople(john, arjun);
+        fg.printPath(shortestPath);
+        System.out.println();
+
+        // The full Adjacency Matrix
         System.out.println(fg);
     }
 }
