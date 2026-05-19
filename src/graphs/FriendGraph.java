@@ -36,8 +36,8 @@ public class FriendGraph {
     public void addFriend(Contact contact, Contact friend) {
 
         // Add the users to the contact map OR grab their index
-        Integer contactIndex = contactMap.computeIfAbsent(contact, k -> contactMap.size());
-        Integer friendIndex = contactMap.computeIfAbsent(friend, k -> contactMap.size());
+        Integer contactIndex = contactMap.computeIfAbsent(contact, _ -> contactMap.size());
+        Integer friendIndex = contactMap.computeIfAbsent(friend, _ -> contactMap.size());
 
         // After we have added the users to the map, check the size of the friends array to resize if necessary
         if (friends.length < contactMap.size()) {
@@ -80,7 +80,7 @@ public class FriendGraph {
                 .map(Map.Entry::getKey)
                 .toArray(Contact[]::new);
 
-        System.out.format("The following friends are \"%s's\" friends:\n", c.getName(), 1024);
+        System.out.format("The following friends are \"%s's\" friends:\n", c.getName());
 
         for (Contact contact : contactList) {
             System.out.println(contact);
