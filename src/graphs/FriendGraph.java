@@ -9,13 +9,14 @@ public class FriendGraph {
     private final int NOT_VISITED = -1;
     private final int FRIEND = 1;
     private final int INITIAL_DIST = 0;
+    private final int INITIAL_SIZE = 2;
 
     // the contact map represents a hashmap for a user and their index in the friends list
     private final HashMap<Contact, Integer> contactMap;
 
     // an adjacency matrix where a contact is represented by an index and their relationships by another int, 0 for no
     // relationship and 1 for relationship
-    private int[][] friends = new int[2][2];
+    private int[][] friends = new int[INITIAL_SIZE][INITIAL_SIZE];
 
 
     public FriendGraph() {
@@ -51,8 +52,8 @@ public class FriendGraph {
         }
 
         // Map the new relationship
-        friends[contactIndex][friendIndex] = 1;
-        friends[friendIndex][contactIndex] = 1;
+        friends[contactIndex][friendIndex] = FRIEND;
+        friends[friendIndex][contactIndex] = FRIEND;
     }
 
     public void removeFriend(Contact contact, Contact friend) {
@@ -92,7 +93,7 @@ public class FriendGraph {
             Contact c = entry.getKey();
             Integer index = entry.getValue();
 
-            int amountOfFriendsForContact = (int) Arrays.stream(friends[index]).filter(v -> v == 1).count();
+            int amountOfFriendsForContact = (int) Arrays.stream(friends[index]).filter(v -> v == FRIEND).count();
             if (amountOfFriendsForContact > mostAmountOfFriends) {
                 mostAmountOfFriends = amountOfFriendsForContact;
                 contactIndexWithMostFriends = c;
@@ -103,6 +104,14 @@ public class FriendGraph {
 
     }
 
+    /**
+     * Utilizing a BFS style algorithm, traverses the adjacency matrix to find the shortest distance between
+     * two people and returns the list (ordered)
+     *
+     * @param contact the contact we are starting from
+     * @param friend  the friend we are traversing to from the contact
+     * @return a linked list mapping out the shortest path traversal from contact to friend
+     */
     public LinkedList<Contact> shortestPathBetweenTwoPeople(Contact contact, Contact friend) {
 
         LinkedList<Contact> queue = new LinkedList<>();
@@ -137,7 +146,7 @@ public class FriendGraph {
 
                 distances.put(f, distances.get(c) + 1);
                 predecessor.put(f, c);
-                queue.add(f);                                // enqueue only when newly discovered
+                queue.add(f); // enqueue only when newly discovered
             }
         }
 
@@ -155,6 +164,11 @@ public class FriendGraph {
         return path;
     }
 
+    /**
+     * Prints the given path of the traveral
+     *
+     * @param path a linked list represent the shortest path of a contact to another contact
+     */
     public void printPath(LinkedList<Contact> path) {
         if (path.isEmpty()) {
             System.out.println("No path exists");
