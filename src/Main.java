@@ -8,7 +8,6 @@ import reader.DotFileReader;
 import trees.GenericTree;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -83,6 +82,7 @@ public class Main {
         Contact david = new Contact("David Brown", "dbrown@example.com", "604-555-0112");
         Contact lucy = new Contact("Lucy Williams", "lwilliams@example.com", "604-555-0109");
         Contact dean = new Contact("Dean McIntosh", "dmcintosh@example.com", "222-235-0789");
+        Contact wei = new Contact("Wei Chen", "wei.chen@example.com", "604-555-0104");
 
         // Add friends
         fg.addFriend(john, alice);
@@ -91,12 +91,13 @@ public class Main {
         fg.addFriend(lucy, john);
         fg.addFriend(lucy, alice);
         fg.addFriend(arjun, lucy);
+        fg.addFriend(john, wei);
 
         // remove friends
         fg.removeFriend(arjun, john);
 
         // most friends
-        System.out.println("The user with the most friends:");
+        System.out.println("The user with the most friends of friends:");
         fg.displayMostFriends();
         System.out.println();
 

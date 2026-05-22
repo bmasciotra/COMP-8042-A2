@@ -26,7 +26,7 @@ public class WeightedFriendGraph extends FriendGraph {
 
     public ContactAndDistance findFirstMatch(Contact contact, String substring) {
         // create a new hashmap containing each contact and their visited status
-        HashMap<Contact, Boolean> visited = this.contactMap
+        HashMap<Contact, Boolean> visited = this.contactsArr
                 .stream()
                 .collect(Collectors.toMap(
                         c -> c,
@@ -36,7 +36,7 @@ public class WeightedFriendGraph extends FriendGraph {
                 ));
 
         // negatives represent infinite
-        HashMap<Contact, Double> distances = this.contactMap
+        HashMap<Contact, Double> distances = this.contactsArr
                 .stream()
                 .collect(Collectors.toMap(c -> c, e -> -1.0, (a, b) -> a, HashMap::new));
 
@@ -51,7 +51,7 @@ public class WeightedFriendGraph extends FriendGraph {
                 return new ContactAndDistance(next, distances.get(next));
             }
 
-            int contactIndex = this.contactMap.indexOf(next);
+            int contactIndex = this.contactsArr.indexOf(next);
 
             // mark visited
             visited.put(next, true);
@@ -64,7 +64,7 @@ public class WeightedFriendGraph extends FriendGraph {
                 int isFriend = friends[i];
 
                 if (isFriend == FRIEND) {
-                    Contact friend = contactMap.get(i);
+                    Contact friend = contactsArr.get(i);
 
                     // if the friend is marked as visited ignore
                     if (visited.get(friend)) continue;
@@ -106,11 +106,11 @@ public class WeightedFriendGraph extends FriendGraph {
         this.addFriend(contact, friend);
 
         // set the weights
-        int contactIndex = this.contactMap.indexOf(contact);
-        int friendIndex = this.contactMap.indexOf(friend);
+        int contactIndex = this.contactsArr.indexOf(contact);
+        int friendIndex = this.contactsArr.indexOf(friend);
 
         // Resize if we need to
-        if (weights.length <= contactMap.size()) {
+        if (weights.length <= contactsArr.size()) {
             resize();
         }
 
@@ -122,7 +122,7 @@ public class WeightedFriendGraph extends FriendGraph {
     public void resize() {
         super.resize();
         // Double the size if we have to resize
-        double[][] resize = new double[this.contactMap.size()][this.contactMap.size()];
+        double[][] resize = new double[this.contactsArr.size()][this.contactsArr.size()];
 
         for (int i = 0; i < weights.length; i++) {
             System.arraycopy(weights[i], 0, resize[i], 0, weights[i].length);

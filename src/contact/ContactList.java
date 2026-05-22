@@ -32,7 +32,11 @@ public class ContactList {
     }
 
     public List<Contact> getEveryContact() {
-        return StreamSupport.stream(this.contacts.levelOrderTraverse().spliterator(), false).map(AvlTreeNode<Contact>::getValue).collect(Collectors.toList());
+
+        List<Contact> contactsAlphabeticalOrder = new ArrayList<>();
+        inOrder(this.contacts.getRoot(), contactsAlphabeticalOrder);
+
+        return contactsAlphabeticalOrder;
     }
 
     public int getAmountOfContacts() {
@@ -67,6 +71,13 @@ public class ContactList {
 
     }
 
+    private void inOrder(AvlTreeNode<Contact> node, List<Contact> out) {
+        if (node == null) return;
+        inOrder(node.getLeftChild(), out);
+        out.add(node.getValue());
+        inOrder(node.getRightChild(), out);
+    }
+
     private Contact findContact(AvlTreeNode<Contact> root, String name) {
 
         // If root is null, no one was found.
@@ -98,6 +109,7 @@ public class ContactList {
             // Traverse both sides
             traverseAndCheckName(root.getLeftChild(), c, contacts);
             traverseAndCheckName(root.getRightChild(), c, contacts);
+            return;
         }
 
         if (Character.toLowerCase(root.getValue().getName().charAt(0)) < Character.toLowerCase(c)) {
