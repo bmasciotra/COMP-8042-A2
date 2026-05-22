@@ -46,7 +46,7 @@ public class Main {
 
         // --- Test each ContactList method ---
 
-        System.out.println("\n[getEveryContact - should print 15 contacts in alphabetical order]");
+        System.out.println("\n[getEveryContact - should print 16 contacts in alphabetical (Surname, Firstname) order]");
         contacts.getEveryContact().forEach(System.out::println);
 
         System.out.println("\n[findContact 'Raj Patel']");
@@ -55,10 +55,10 @@ public class Main {
         System.out.println("\n[findContact 'Doesnt Exist' - should be null]");
         System.out.println(contacts.findContact("Doesnt Exist"));
 
-        System.out.println("\n[getEveryContactStartingWith 'S' - expect Sarah Brown]");
+        System.out.println("\n[getEveryContactStartingWith 'S' - expect Singh, Smith x2 (surnames starting with S)]");
         contacts.getEveryContactStartingWith('S').forEach(System.out::println);
 
-        System.out.println("\n[getEveryContactStartingWith 'A' - expect Arjun Singh]");
+        System.out.println("\n[getEveryContactStartingWith 'A' - expect Anderson x2 (surnames starting with A)]");
         contacts.getEveryContactStartingWith('A').forEach(System.out::println);
 
         System.out.println("\n[getStringMatchingContacts 'Joh' - expect Johansson, Johnson]");
@@ -96,7 +96,7 @@ public class Main {
         // remove friends
         fg.removeFriend(arjun, john);
 
-        // most friends
+        // most friends-of-friends
         System.out.println("The user with the most friends of friends:");
         fg.displayMostFriends();
         System.out.println();

@@ -20,11 +20,11 @@ public class ContactList {
     }
 
     public Contact findContact(String name) {
-        return findContact(this.contacts.getRoot(), name);
+        return searchAndFind(this.contacts.getRoot(), name);
     }
 
     public void removeContact(String name) {
-        Contact c = findContact(this.contacts.getRoot(), name);
+        Contact c = searchAndFind(this.contacts.getRoot(), name);
 
         if (c != null) {
             this.contacts.remove(c);
@@ -32,7 +32,6 @@ public class ContactList {
     }
 
     public List<Contact> getEveryContact() {
-
         List<Contact> contactsAlphabeticalOrder = new ArrayList<>();
         inOrder(this.contacts.getRoot(), contactsAlphabeticalOrder);
 
@@ -43,13 +42,6 @@ public class ContactList {
         return getEveryContact().size();
     }
 
-    /**
-     * We can perform a binary search because the name starts with the letter and is the main criteria for how the tree
-     * is structured
-     *
-     * @param letter the letter we are using to query contacts
-     * @return a list of contacts where their name starts with the given letter (case ignored)
-     */
     public List<Contact> getEveryContactStartingWith(char letter) {
         List<Contact> contactList = new ArrayList<>();
 
@@ -68,7 +60,6 @@ public class ContactList {
      */
     public List<Contact> getStringMatchingContacts(String segment) {
         return StreamSupport.stream(this.contacts.levelOrderTraverse().spliterator(), false).map(AvlTreeNode<Contact>::getValue).filter(c -> c.getName().contains(segment)).collect(Collectors.toList());
-
     }
 
     private void inOrder(AvlTreeNode<Contact> node, List<Contact> out) {
@@ -78,24 +69,28 @@ public class ContactList {
         inOrder(node.getRightChild(), out);
     }
 
-    private Contact findContact(AvlTreeNode<Contact> root, String name) {
-
-        // If root is null, no one was found.
+    private Contact searchAndFind(AvlTreeNode<Contact> root, String name) {
         if (root == null) return null;
 
         Contact contact = root.getValue();
 
-        if (contact.getName().compareToIgnoreCase(name) == 0) return contact;
+        String thisSurname = Contact.extractSurname(contact.getName());
+        String searchSurname = Contact.extractSurname(name);
 
-        if (contact.getName().charAt(0) > name.charAt(0)) {
-            return findContact(root.getLeftChild(), name);
-        } else {
-            return findContact(root.getRightChild(), name);
+        int comparison = thisSurname.compareToIgnoreCase(searchSurname);
+
+        if (comparison == 0) {
+            comparison = contact.getName().compareToIgnoreCase(name);
         }
+
+        if (comparison == 0) return contact;
+        if (comparison > 0) return searchAndFind(root.getLeftChild(), name);
+
+        return searchAndFind(root.getRightChild(), name);
     }
 
     /***
-     * Recursively traverses the tree and adds contacts to a list when their name starts with the given letter c (case ignored)
+     * Recursively traverses the tree and adds contacts to a list when their last name starts with the given letter c (case ignored)
      * @param root the root node we are examining
      * @param c the char that we are matching to the first char of the contacts name
      * @param contacts a list of contacts
@@ -103,23 +98,25 @@ public class ContactList {
     private void traverseAndCheckName(AvlTreeNode<Contact> root, char c, List<Contact> contacts) {
         if (root == null) return;
 
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) == Character.toLowerCase(c)) {
-            contacts.add(root.getValue());
+        String surname = Contact.extractSurname(root.getValue().getName());
 
-            // Traverse both sides
+        char nodeFirstChar = Character.toLowerCase(surname.charAt(0));
+        char target = Character.toLowerCase(c);
+
+        if (nodeFirstChar == target) {
+            contacts.add(root.getValue());
+            // Traverse both sides — other matches could exist on either side
             traverseAndCheckName(root.getLeftChild(), c, contacts);
             traverseAndCheckName(root.getRightChild(), c, contacts);
             return;
         }
 
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) < Character.toLowerCase(c)) {
+        if (nodeFirstChar < target) {
+            // surname is "before" target — matches can only be on the right
             traverseAndCheckName(root.getRightChild(), c, contacts);
-        }
-
-        if (Character.toLowerCase(root.getValue().getName().charAt(0)) >= Character.toLowerCase(c)) {
+        } else {
+            // surname is "after" target — matches can only be on the left
             traverseAndCheckName(root.getLeftChild(), c, contacts);
         }
     }
-
-
 }

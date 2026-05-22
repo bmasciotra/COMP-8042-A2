@@ -12,7 +12,6 @@ public class FriendGraph {
     protected final int INITIAL_DIST = 0;
     protected final int INITIAL_SIZE = 2;
 
-    // the contact map represents a hashmap for a user and their index in the friends list
     protected final ArrayList<Contact> contactsArr;
 
     // an adjacency matrix where a contact is represented by an index and their relationships by another int, 0 for no
@@ -63,6 +62,8 @@ public class FriendGraph {
     public void removeFriend(Contact contact, Contact friend) {
         int contactIndex = contactsArr.indexOf(contact);
         int friendIndex = contactsArr.indexOf(friend);
+
+        if (contactIndex == -1 || friendIndex == -1) return;
 
         friends[contactIndex][friendIndex] = 0;
         friends[friendIndex][contactIndex] = 0;
@@ -239,7 +240,7 @@ public class FriendGraph {
 
 
     protected void resize() {
-        int[][] resize = new int[contactsArr.size()][contactsArr.size()];
+        int[][] resize = new int[contactsArr.size() * 2][contactsArr.size() * 2];
 
         for (int i = 0; i < friends.length; i++) {
             System.arraycopy(friends[i], 0, resize[i], 0, friends[i].length);

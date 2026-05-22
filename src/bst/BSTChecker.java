@@ -6,14 +6,17 @@ import trees.GenericTree;
 import java.util.List;
 
 public class BSTChecker {
-    final private int _left = 0;
-    final private int _right = 1;
-    final private int _maxChildren = 2;
+    final private int LEFT = 0;
+    final private int RIGHT = 1;
+    final private int MAX_CHILDREN = 2;
 
     public boolean isBinarySearchTree(GenericTree<Integer> tree) {
 
         GenericTreeNode<Integer> root = tree.getRoot();
-        return recurseTree(root);
+
+        if (root == null) return true; // empty tree by definition is a bst
+
+        return recurseTree(root, null, null);
     }
 
 
@@ -25,9 +28,14 @@ public class BSTChecker {
      * @param root the root being examined
      * @return if the root has verified or broken the binary tree rules
      */
-    private boolean recurseTree(GenericTreeNode<Integer> root) {
+    private boolean recurseTree(GenericTreeNode<Integer> root, Integer min, Integer max) {
+        int value = root.getValue();
 
-        if (root.getChildren().size() > _maxChildren) return false;
+        // detect if there is a value that meets the ruleset for the root but not the tree
+        if (min != null && value <= min) return false;
+        if (max != null && value >= max) return false;
+
+        if (root.getChildren().size() > MAX_CHILDREN) return false;
 
         List<GenericTreeNode<Integer>> children = root.getChildren();
 
@@ -36,8 +44,9 @@ public class BSTChecker {
 
         // recurse the left side
         if (!children.isEmpty()) {
-            GenericTreeNode<Integer> leftChild = children.get(_left);
-            GenericTreeNode<Integer> rightChild = children.get(_right);
+            GenericTreeNode<Integer> leftChild = children.get(LEFT);
+            GenericTreeNode<Integer> rightChild = children.size() > 1 ? children.get(RIGHT) : null;
+
 
             if (leftChild != null) {
                 // if the left child is greater than the pivot we have an invalidation
@@ -47,7 +56,7 @@ public class BSTChecker {
 
                 if (!leftChild.getChildren().isEmpty()) {
                     // the left child is now the pivot point
-                    leftIsTree = leftIsTree && recurseTree(leftChild);
+                    leftIsTree = leftIsTree && recurseTree(leftChild, min, root.getValue());
                 }
             }
 
@@ -60,7 +69,7 @@ public class BSTChecker {
 
                 if (!rightChild.getChildren().isEmpty()) {
                     // the right child is now the pivot point
-                    rightIsTree = rightIsTree && recurseTree(rightChild);
+                    rightIsTree = rightIsTree && recurseTree(rightChild, root.getValue(), max);
                 }
             }
         }

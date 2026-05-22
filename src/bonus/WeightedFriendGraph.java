@@ -14,9 +14,6 @@ public class WeightedFriendGraph extends FriendGraph {
     // where 1.0 is a very close friend and 0.0 is no friend
     public double[][] weights;
 
-    /**
-     * The Weighted Graph represents a MST
-     */
     public WeightedFriendGraph() {
         super();
 
@@ -122,7 +119,7 @@ public class WeightedFriendGraph extends FriendGraph {
     public void resize() {
         super.resize();
         // Double the size if we have to resize
-        double[][] resize = new double[this.contactsArr.size()][this.contactsArr.size()];
+        double[][] resize = new double[this.contactsArr.size() * 2][this.contactsArr.size() * 2];
 
         for (int i = 0; i < weights.length; i++) {
             System.arraycopy(weights[i], 0, resize[i], 0, weights[i].length);

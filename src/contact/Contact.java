@@ -39,17 +39,24 @@ public class Contact implements Comparable<Contact> {
         return "Name: " + name + ", Email: " + email + ", Phone: " + phone;
     }
 
+    // for sorting by surname
+    public static String extractSurname(String fullName) {
+        int lastSpace = fullName.lastIndexOf(' ');
+        return lastSpace == -1 ? fullName : fullName.substring(lastSpace + 1);
+    }
+
     /**
      * Comparison function where the name then, email then phone will be evaluated for location in the tree
      */
     @Override
     public int compareTo(Contact o) {
-        int byName = this.name.compareTo(o.getName());
+        int bySurname = extractSurname(this.name).compareToIgnoreCase(extractSurname(o.getName()));
+        if (bySurname != 0) return bySurname;
 
+        int byName = this.name.compareToIgnoreCase(o.getName());
         if (byName != 0) return byName;
 
         int byEmail = this.email.compareTo(o.getEmail());
-
         if (byEmail != 0) return byEmail;
 
         return this.phone.compareTo(o.getPhone());
