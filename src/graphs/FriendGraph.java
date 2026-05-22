@@ -2,31 +2,32 @@ package graphs;
 
 import contact.Contact;
 
+import java.lang.reflect.Array;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class FriendGraph {
 
-    private final int NOT_VISITED = -1;
-    private final int FRIEND = 1;
-    private final int INITIAL_DIST = 0;
-    private final int INITIAL_SIZE = 2;
+    protected final int NOT_VISITED = -1;
+    protected final int FRIEND = 1;
+    protected final int INITIAL_DIST = 0;
+    protected final int INITIAL_SIZE = 2;
 
     // the contact map represents a hashmap for a user and their index in the friends list
-    private final HashMap<Contact, Integer> contactMap;
+    protected final ArrayList<Contact> contactMap;
 
     // an adjacency matrix where a contact is represented by an index and their relationships by another int, 0 for no
     // relationship and 1 for relationship
-    private int[][] friends = new int[INITIAL_SIZE][INITIAL_SIZE];
+    protected int[][] friends = new int[INITIAL_SIZE][INITIAL_SIZE];
 
 
     public FriendGraph() {
-        contactMap = new HashMap<>();
+        contactMap = new ArrayList<>();
     }
 
 
     /**
      * Add friend allows a main contact (ie the friend) to add a new friend relationship to the graph
-     * <p>
      * this contact will now have a new edge for that friend, and it will be represented as 1 or 0 where 1 is there is a
      * relationship
      *
@@ -36,19 +37,23 @@ public class FriendGraph {
     public void addFriend(Contact contact, Contact friend) {
 
         // Add the users to the contact map OR grab their index
-        Integer contactIndex = contactMap.computeIfAbsent(contact, _ -> contactMap.size());
-        Integer friendIndex = contactMap.computeIfAbsent(friend, _ -> contactMap.size());
+        int contactIndex = contactMap.indexOf(contact);
+
+        if (contactIndex == -1) {
+            contactMap.add(contact);
+            contactIndex = contactMap.size() - 1;
+        }
+
+        int friendIndex = contactMap.indexOf(friend);
+
+        if (friendIndex == -1) {
+            contactMap.add(friend);
+            friendIndex = contactMap.size() - 1;
+        }
 
         // After we have added the users to the map, check the size of the friends array to resize if necessary
-        if (friends.length < contactMap.size()) {
-            // Double the size if we have to resize
-            int[][] resize = new int[contactMap.size()][contactMap.size()];
-
-            for (int i = 0; i < friends.length; i++) {
-                System.arraycopy(friends[i], 0, resize[i], 0, friends[i].length);
-            }
-
-            friends = resize;
+        if (friends.length <= contactMap.size()) {
+            resize();
         }
 
         // Map the new relationship
@@ -57,8 +62,8 @@ public class FriendGraph {
     }
 
     public void removeFriend(Contact contact, Contact friend) {
-        Integer contactIndex = contactMap.get(contact);
-        Integer friendIndex = contactMap.get(friend);
+        int contactIndex = contactMap.indexOf(contact);
+        int friendIndex = contactMap.indexOf(friend);
 
         friends[contactIndex][friendIndex] = 0;
         friends[friendIndex][contactIndex] = 0;
@@ -71,14 +76,11 @@ public class FriendGraph {
      */
     public void displayAllFriends(Contact c) {
 
-        int adjacencyIndex = contactMap.get(c);
+        int adjacencyIndex = contactMap.indexOf(c);
         int[] friendsList = friends[adjacencyIndex];
 
         // find all the contacts friend/relationships
-        Contact[] contactList = contactMap.entrySet().stream()
-                .filter(e -> friendsList[e.getValue()] == FRIEND)
-                .map(Map.Entry::getKey)
-                .toArray(Contact[]::new);
+        Contact[] contactList = IntStream.range(0, contactMap.size()).filter(i -> friendsList[i] == FRIEND).mapToObj(contactMap::get).toArray(Contact[]::new);
 
         System.out.format("The following friends are \"%s's\" friends:\n", c.getName());
 
@@ -97,11 +99,12 @@ public class FriendGraph {
         Contact contactIndexWithMostFriends = null;
         int mostAmountOfFriends = 0;
 
-        for (Map.Entry<Contact, Integer> entry : contactMap.entrySet()) {
-            Contact c = entry.getKey();
-            Integer index = entry.getValue();
 
-            int amountOfFriendsForContact = (int) Arrays.stream(friends[index]).filter(v -> v == FRIEND).count();
+        for (int i = 0; i < this.contactMap.size(); i++) {
+            Contact c = contactMap.get(i);
+
+            int amountOfFriendsForContact = (int) Arrays.stream(friends[i]).filter(v -> v == FRIEND).count();
+
             if (amountOfFriendsForContact > mostAmountOfFriends) {
                 mostAmountOfFriends = amountOfFriendsForContact;
                 contactIndexWithMostFriends = c;
@@ -126,7 +129,7 @@ public class FriendGraph {
         HashMap<Contact, Integer> distances = new HashMap<>();
         HashMap<Contact, Contact> predecessor = new HashMap<>();
 
-        for (Contact c : contactMap.keySet()) {
+        for (Contact c : this.contactMap) {
             // -1 is our infinity and the initial value to know that a contact has not been visited
             distances.put(c, NOT_VISITED);
         }
@@ -141,14 +144,13 @@ public class FriendGraph {
 
         while (!queue.isEmpty()) {
             Contact c = queue.poll();
-            int index = contactMap.get(c);
+            int index = contactMap.indexOf(c);
 
-            for (Map.Entry<Contact, Integer> entry : contactMap.entrySet()) {
-                Contact f = entry.getKey();
-                int fIndex = entry.getValue();
+            for (int i = 0; i < this.contactMap.size(); i++) {
+                Contact f = this.contactMap.get(i);
 
                 // contact is not a neighbor if adjacency shows 0
-                if (friends[index][fIndex] != FRIEND) continue;
+                if (friends[index][i] != FRIEND) continue;
                 // if distances registers -1 that user has not been visited
                 if (distances.get(f) != NOT_VISITED) continue;
 
@@ -189,9 +191,8 @@ public class FriendGraph {
         }
 
         StringBuilder sb = new StringBuilder("through ");
-        sb.append(path.get(0).getName())
-                .append("'s friend ")
-                .append(path.get(1).getName());
+
+        sb.append(path.get(0).getName()).append("'s friend ").append(path.get(1).getName());
 
         for (int i = 2; i < path.size(); i++) {
             sb.append(" who knows ").append(path.get(i).getName());
@@ -207,28 +208,45 @@ public class FriendGraph {
         if (n == 0) return "(empty graph)\n";
 
         Contact[] byIndex = new Contact[n];
-        for (Contact c : contactMap.keySet()) {
-            byIndex[contactMap.get(c)] = c;
+
+        for (int i = 0; i < this.contactMap.size(); i++) {
+            byIndex[i] = this.contactMap.get(i);
         }
 
         int colWidth = 10;
         StringBuilder sb = new StringBuilder();
 
         sb.append(pad("", colWidth));
+
         for (int j = 0; j < n; j++) {
             sb.append(pad(byIndex[j].getName(), colWidth));
         }
+
         sb.append('\n');
 
         for (int i = 0; i < n; i++) {
             sb.append(pad(byIndex[i].getName(), colWidth));
+
             for (int j = 0; j < n; j++) {
                 sb.append(pad(String.valueOf(friends[i][j]), colWidth));
             }
+
             sb.append('\n');
         }
 
         return sb.toString();
+    }
+
+
+    protected void resize() {
+        int[][] resize = new int[contactMap.size()][contactMap.size()];
+
+        for (int i = 0; i < friends.length; i++) {
+            System.arraycopy(friends[i], 0, resize[i], 0, friends[i].length);
+        }
+
+        friends = resize;
+
     }
 
     private static String pad(String s, int width) {

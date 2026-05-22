@@ -1,3 +1,5 @@
+import bonus.ContactAndDistance;
+import bonus.WeightedFriendGraph;
 import bst.BSTChecker;
 import contact.Contact;
 import contact.ContactList;
@@ -80,6 +82,7 @@ public class Main {
         Contact arjun = new Contact("Arjun Singh", "arjun.s@example.com", "604-555-0115");
         Contact david = new Contact("David Brown", "dbrown@example.com", "604-555-0112");
         Contact lucy = new Contact("Lucy Williams", "lwilliams@example.com", "604-555-0109");
+        Contact dean = new Contact("Dean McIntosh", "dmcintosh@example.com", "222-235-0789");
 
         // Add friends
         fg.addFriend(john, alice);
@@ -107,5 +110,21 @@ public class Main {
 
         // The full Adjacency Matrix
         System.out.println(fg);
+
+
+        // Bonus - Weighted FG
+        WeightedFriendGraph wg = new WeightedFriendGraph();
+
+        wg.addFriend(john, alice, 0.5);
+        wg.addFriend(arjun, john, 0.1);
+        wg.addFriend(david, alice, 0.2);
+        wg.addFriend(lucy, john, 0.85);
+        wg.addFriend(lucy, alice, 0.7);
+        wg.addFriend(arjun, lucy, 0.1);
+        wg.addFriend(dean, arjun, 0.9);
+
+        ContactAndDistance c = wg.findFirstMatch(john, "De");
+
+        System.out.println(c);
     }
 }
